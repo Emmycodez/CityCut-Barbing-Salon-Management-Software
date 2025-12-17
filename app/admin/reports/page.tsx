@@ -1,9 +1,7 @@
-import React from 'react'
+import { DetailedReports } from "@/components/admin";
 
 const ReportsPage = () => {
-  return (
-    <div>ReportsPage</div>
-  )
-}
+  return <DetailedReports />;
+};
 
-export default ReportsPage
+export default ReportsPage;

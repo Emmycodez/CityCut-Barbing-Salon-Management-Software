@@ -1,4 +1,5 @@
 import { DashboardOverview } from "./dashboard";
 import { SalesHistory } from "./sales";
+import { DetailedReports } from "./reports";
 
-export {DashboardOverview, SalesHistory}
+export {DashboardOverview, SalesHistory, DetailedReports}
