@@ -1,65 +1,95 @@
-import Image from "next/image";
+import Link from "next/link"
+import { Button } from "@/components/ui/button"
+import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Scissors, TrendingUp, Users, LogIn } from "lucide-react"
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+    <div className="min-h-screen flex flex-col bg-background text-foreground">
+      {/* Header */}
+      <header className="border-b border-border bg-background text-foreground">
+        <div className="container mx-auto px-4 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-lg bg-primary flex items-center justify-center">
+              <Scissors className="w-6 h-6 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-xl font-bold text-foreground">CityCut</h1>
+              <p className="text-xs text-muted-foreground">Management System</p>
+            </div>
+          </div>
+          <Button asChild size="sm">
+            <Link href="/login">
+              <LogIn className="w-4 h-4 mr-2" />
+              Sign In
+            </Link>
+          </Button>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+      </header>
+
+      {/* Hero Section */}
+      <main className="flex-1 container mx-auto px-4 py-12 md:py-20 bg-background text-foreground">
+        <div className="max-w-4xl mx-auto text-center mb-16">
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">Streamline Your Barbershop Operations</h2>
+          <p className="text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
+            Professional management system to record services, track expenses, and monitor revenue with ease.
+          </p>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Button asChild size="lg" className="text-base">
+              <Link href="/sales">Sales Dashboard</Link>
+            </Button>
+            <Button asChild size="lg" variant="outline" className="text-base bg-transparent">
+              <Link href="/admin">Admin Dashboard</Link>
+            </Button>
+          </div>
+        </div>
+
+        {/* Features Grid */}
+        <div className="grid gap-6 md:grid-cols-3 max-w-5xl mx-auto">
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Scissors className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle>Service Recording</CardTitle>
+              <CardDescription>
+                Quick and easy service entry with customer details, barber assignment, and payment tracking
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <TrendingUp className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle>Revenue Analytics</CardTitle>
+              <CardDescription>
+                Real-time sales summaries, expense tracking, and comprehensive revenue monitoring
+              </CardDescription>
+            </CardHeader>
+          </Card>
+
+          <Card className="border-border bg-card">
+            <CardHeader>
+              <div className="w-12 h-12 rounded-lg bg-primary/10 flex items-center justify-center mb-4">
+                <Users className="w-6 h-6 text-primary" />
+              </div>
+              <CardTitle>Customer Management</CardTitle>
+              <CardDescription>
+                Maintain detailed customer records with service history and contact information
+              </CardDescription>
+            </CardHeader>
+          </Card>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="border-t border-border py-6">
+        <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
+          <p>© 2025 CityCut BarberShop Management System. All rights reserved.</p>
+        </div>
+      </footer>
     </div>
-  );
+  )
 }
