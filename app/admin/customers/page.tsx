@@ -1,8 +1,8 @@
-import React from 'react'
+import { CustomerRecords } from '@/components/admin'
 
 const CustomersPage = () => {
   return (
-    <div>CustomersPage</div>
+    <CustomerRecords/>
   )
 }
 
