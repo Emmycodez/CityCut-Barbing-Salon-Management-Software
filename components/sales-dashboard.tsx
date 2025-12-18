@@ -10,22 +10,48 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Scissors, DollarSign, Receipt, LogOut, Plus } from "lucide-react";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  Scissors,
+  DollarSign,
+  Receipt,
+  LogOut,
+  Plus,
+  MessageCircleWarning,
+  Eye,
+} from "lucide-react";
 import { ServiceRecordDialog } from "./service-record-dialog";
 import { ExpenseRecordDialog } from "./expense-record-dialog";
+import { Decimal } from "@prisma/client/runtime/client";
 
-export function SalesDashboard() {
+interface Props {
+  services: any[];
+  expenses: any[];
+  todaySales: number | Decimal;
+  todayServices: number;
+  todayExpenses: number | Decimal;
+}
+
+export function SalesDashboard({
+  services,
+  expenses,
+  todaySales,
+  todayServices,
+  todayExpenses,
+}: Props) {
   const [showServiceDialog, setShowServiceDialog] = useState(false);
   const [showExpenseDialog, setShowExpenseDialog] = useState(false);
-
-  // Mock data
-  const todaySales = 850.0;
-  const todayServices = 12;
-  const todayExpenses = 150.0;
+  const [selectedService, setSelectedService] = useState<any | null>(null);
+  const [selectedExpense, setSelectedExpense] = useState<any | null>(null);
 
   return (
     <div className="min-h-screen flex flex-col ">
-      {/* Header */}
       {/* Header */}
       <header className="border-b border-border bg-card sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
@@ -66,7 +92,7 @@ export function SalesDashboard() {
               <div className="flex items-center gap-2">
                 <DollarSign className="w-5 h-5 text-primary" />
                 <span className="text-3xl font-bold text-foreground">
-                  ${todaySales.toFixed(2)}
+                  ₦{Number(todaySales)}
                 </span>
               </div>
             </CardContent>
@@ -98,7 +124,7 @@ export function SalesDashboard() {
               <div className="flex items-center gap-2">
                 <Receipt className="w-5 h-5 text-destructive" />
                 <span className="text-3xl font-bold text-foreground">
-                  ${todayExpenses.toFixed(2)}
+                  ₦{Number(todayExpenses)}
                 </span>
               </div>
             </CardContent>
@@ -126,44 +152,294 @@ export function SalesDashboard() {
           </Button>
         </div>
 
-        {/* Recent Activity */}
-        <Card className="border-border bg-card">
-          <CardHeader>
-            <CardTitle>Today's Activity</CardTitle>
-            <CardDescription>Recent services and transactions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {[1, 2, 3, 4, 5].map((_, idx) => (
-                <div
-                  key={idx}
-                  className="flex items-center justify-between py-3 border-b border-border last:border-0"
-                >
-                  <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-background text-foreground flex items-center justify-center">
-                      <Scissors className="w-5 h-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="font-medium text-foreground">
-                        Haircut & Beard Trim
-                      </p>
-                      <p className="text-sm text-muted-foreground">
-                        John Smith • Barber: Mike
-                      </p>
-                    </div>
-                  </div>
-                  <div className="text-right">
-                    <p className="font-semibold text-foreground">$45.00</p>
-                    <p className="text-xs text-muted-foreground">Cash</p>
-                  </div>
+        {/* Recent Activity - Services and Expenses Side by Side */}
+        <div className="grid gap-6 md:grid-cols-2">
+          {/* Recent Services */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Services</CardTitle>
+              <CardDescription>
+                Latest {services.length} service transactions
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {services.length < 1 ? (
+                <div className="space-y-4 flex flex-col items-center justify-center py-8">
+                  <MessageCircleWarning className="w-10 h-10 text-muted-foreground" />
+                  <p className="text-muted-foreground text-center">
+                    No recent service transactions recorded yet
+                  </p>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              ) : (
+                <div className="space-y-4">
+                  {services.map((s) => (
+                    <div
+                      key={s.id}
+                      className="flex flex-col gap-3 py-3 px-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+                          <Scissors className="w-5 h-5 text-primary" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground capitalize">
+                            {s.serviceType}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {s.customer.name} • {s.barberName}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="font-semibold text-foreground">
+                              ₦{s.amountPaid}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {s.date}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedService(s)}
+                        className="cursor-pointer w-full"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Details
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Recent Expenses */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Recent Expenses</CardTitle>
+              <CardDescription>
+                Latest {expenses.length} expense records
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              {expenses.length < 1 ? (
+                <div className="space-y-4 flex flex-col items-center justify-center py-8">
+                  <MessageCircleWarning className="w-10 h-10 text-muted-foreground" />
+                  <p className="text-muted-foreground text-center">
+                    No recent expenses recorded yet
+                  </p>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {expenses.map((e) => (
+                    <div
+                      key={e.id}
+                      className="flex flex-col gap-3 py-3 px-4 rounded-lg bg-secondary/50 hover:bg-secondary transition-colors"
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="w-10 h-10 rounded-full bg-destructive/10 flex items-center justify-center flex-shrink-0">
+                          <Receipt className="w-5 h-5 text-destructive" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-medium text-foreground">
+                            {e.category}
+                          </p>
+                          <p className="text-sm text-muted-foreground truncate">
+                            {e.description}
+                          </p>
+                          <div className="flex items-center justify-between mt-2">
+                            <p className="font-semibold text-foreground">
+                              ₦{e.amount}
+                            </p>
+                            <p className="text-xs text-muted-foreground">
+                              {e.date}
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setSelectedExpense(e)}
+                        className="cursor-pointer w-full"
+                      >
+                        <Eye className="w-4 h-4 mr-1" />
+                        View Details
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
 
-      {/* Dialogs */}
+      {/* Service Details Dialog */}
+      <Dialog
+        open={!!selectedService}
+        onOpenChange={() => setSelectedService(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Service Details</DialogTitle>
+            <DialogDescription>
+              Complete information about this service
+            </DialogDescription>
+          </DialogHeader>
+          {selectedService && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Customer Name</p>
+                  <p className="font-medium text-foreground">
+                    {selectedService.customer.name}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Phone Number</p>
+                  <p className="font-medium text-foreground">
+                    {selectedService.customer.phone}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Service Type</p>
+                  <p className="font-medium text-foreground capitalize">
+                    {selectedService.serviceType}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Barber</p>
+                  <p className="font-medium text-foreground">
+                    {selectedService.barberName}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Date</p>
+                  <p className="font-medium text-foreground">
+                    {new Date(selectedService.serviceDate).toLocaleDateString(
+                      "en-NG",
+                      {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      }
+                    )}
+                  </p>
+                </div>
+
+                <div>
+                  <p className="text-sm text-muted-foreground">Time</p>
+                  <p className="font-medium text-foreground">
+                    {new Date(selectedService.serviceDate).toLocaleTimeString(
+                      "en-NG",
+                      {
+                        hour: "2-digit",
+                        minute: "2-digit",
+                        hour12: true, // Nigerians commonly use 12-hour format
+                      }
+                    )}
+                  </p>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Amount Paid</p>
+                  <p className="font-semibold text-lg text-foreground">
+                    ₦{selectedService.amountPaid}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">
+                    Payment Method
+                  </p>
+                  <p className="font-medium text-foreground">
+                    {selectedService.paymentMethod}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Expense Details Dialog */}
+      <Dialog
+        open={!!selectedExpense}
+        onOpenChange={() => setSelectedExpense(null)}
+      >
+        <DialogContent className="max-w-md">
+          <DialogHeader>
+            <DialogTitle>Expense Details</DialogTitle>
+            <DialogDescription>
+              Complete information about this expense
+            </DialogDescription>
+          </DialogHeader>
+          {selectedExpense && (
+            <div className="space-y-4">
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Category</p>
+                  <p className="font-medium text-foreground">
+                    {selectedExpense.category}
+                  </p>
+                </div>
+                <div>
+                  <p className="text-sm text-muted-foreground">Date</p>
+                  <p className="font-medium text-foreground">
+                    {selectedExpense.date}
+                  </p>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-sm text-muted-foreground">Description</p>
+                <p className="font-medium text-foreground">
+                  {selectedExpense.description}
+                </p>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <p className="text-sm text-muted-foreground">Amount</p>
+                  <p className="font-semibold text-lg text-foreground">
+                    ₦{selectedExpense.amount}
+                  </p>
+                </div>
+                {selectedExpense.paymentMethod && (
+                  <div>
+                    <p className="text-sm text-muted-foreground">
+                      Payment Method
+                    </p>
+                    <p className="font-medium text-foreground">
+                      {selectedExpense.paymentMethod}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {selectedExpense.notes && (
+                <div>
+                  <p className="text-sm text-muted-foreground">Notes</p>
+                  <p className="font-medium text-foreground">
+                    {selectedExpense.notes}
+                  </p>
+                </div>
+              )}
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Record Dialogs */}
       <ServiceRecordDialog
         open={showServiceDialog}
         onOpenChange={setShowServiceDialog}

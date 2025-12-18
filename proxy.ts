@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import  {authOptions } from "@/app/api/auth/[...nextauth]/route"
 
-export default async function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const url = request.nextUrl.clone();
 
   // Allow public routes
@@ -26,7 +26,7 @@ export default async function proxy(request: NextRequest) {
   }
 
   // Protect sales rep routes
-  if (url.pathname.startsWith("/sales") && session.user.role !== "SALES_REP") {
+  if (url.pathname.startsWith("/sales") && session.user.role !== "SALES_REP" ) {
     url.pathname = "/unauthorized";
     return NextResponse.redirect(url);
   }

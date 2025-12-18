@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Rethink_Sans } from "next/font/google";
 import "./globals.css";
+import { Toaster } from "react-hot-toast";
 
 // const manrope = Manrope({
 //   subsets: ["latin"],
@@ -27,6 +28,7 @@ export default function RootLayout({
         className={`${inter.className} antialiased`}
         suppressHydrationWarning={true}
       >
+        <Toaster />
         {children}
       </body>
     </html>

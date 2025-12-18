@@ -24,6 +24,8 @@ import {
 } from "@/components/ui/select";
 import { Scissors, ArrowLeft } from "lucide-react";
 import { Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
+import toast from "react-hot-toast";
 
 export function LoginForm() {
   const router = useRouter();
@@ -31,14 +33,32 @@ export function LoginForm() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Redirect based on role
-    if (role === "sales") {
-      router.push("/sales");
-    } else if (role === "admin") {
-      router.push("/admin");
+    setLoading(true);
+
+    if (!role) return;
+
+    // Attempt login via NextAuth credentials
+    const result = await signIn("credentials", {
+      redirect: false, // we handle redirect manually
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (result?.ok) {
+      // Redirect based on role after successful login
+      if (role === "sales") {
+        router.push("/sales");
+      } else if (role === "admin") {
+        router.push("/admin");
+      }
+    } else {
+      toast.error("Invalid email or password");
     }
   };
 
@@ -113,9 +133,9 @@ export function LoginForm() {
           <Button
             type="submit"
             className="w-full cursor-pointer"
-            disabled={!role}
+            disabled={!role || loading}
           >
-            Sign In
+            {loading ? "Signing In..." : "Sign In"}
           </Button>
         </form>
       </CardContent>

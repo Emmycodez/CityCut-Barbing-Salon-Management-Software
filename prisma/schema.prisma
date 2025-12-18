@@ -13,6 +13,7 @@ datasource db {
   provider = "postgresql"
 }
 
+
 enum UserRole {
   ADMIN
   SALES_REP
@@ -39,7 +40,8 @@ model User {
 model Customer {
   id    String @id @default(uuid())
   name  String
-  phone String
+  phone String @unique
+  visits  Int    @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

@@ -2804,14 +2804,25 @@ export namespace Prisma {
 
   export type AggregateCustomer = {
     _count: CustomerCountAggregateOutputType | null
+    _avg: CustomerAvgAggregateOutputType | null
+    _sum: CustomerSumAggregateOutputType | null
     _min: CustomerMinAggregateOutputType | null
     _max: CustomerMaxAggregateOutputType | null
+  }
+
+  export type CustomerAvgAggregateOutputType = {
+    visits: number | null
+  }
+
+  export type CustomerSumAggregateOutputType = {
+    visits: number | null
   }
 
   export type CustomerMinAggregateOutputType = {
     id: string | null
     name: string | null
     phone: string | null
+    visits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2820,6 +2831,7 @@ export namespace Prisma {
     id: string | null
     name: string | null
     phone: string | null
+    visits: number | null
     createdAt: Date | null
     updatedAt: Date | null
   }
@@ -2828,16 +2840,26 @@ export namespace Prisma {
     id: number
     name: number
     phone: number
+    visits: number
     createdAt: number
     updatedAt: number
     _all: number
   }
 
 
+  export type CustomerAvgAggregateInputType = {
+    visits?: true
+  }
+
+  export type CustomerSumAggregateInputType = {
+    visits?: true
+  }
+
   export type CustomerMinAggregateInputType = {
     id?: true
     name?: true
     phone?: true
+    visits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2846,6 +2868,7 @@ export namespace Prisma {
     id?: true
     name?: true
     phone?: true
+    visits?: true
     createdAt?: true
     updatedAt?: true
   }
@@ -2854,6 +2877,7 @@ export namespace Prisma {
     id?: true
     name?: true
     phone?: true
+    visits?: true
     createdAt?: true
     updatedAt?: true
     _all?: true
@@ -2897,6 +2921,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: CustomerAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: CustomerSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: CustomerMinAggregateInputType
@@ -2927,6 +2963,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: CustomerCountAggregateInputType | true
+    _avg?: CustomerAvgAggregateInputType
+    _sum?: CustomerSumAggregateInputType
     _min?: CustomerMinAggregateInputType
     _max?: CustomerMaxAggregateInputType
   }
@@ -2935,9 +2973,12 @@ export namespace Prisma {
     id: string
     name: string
     phone: string
+    visits: number
     createdAt: Date
     updatedAt: Date
     _count: CustomerCountAggregateOutputType | null
+    _avg: CustomerAvgAggregateOutputType | null
+    _sum: CustomerSumAggregateOutputType | null
     _min: CustomerMinAggregateOutputType | null
     _max: CustomerMaxAggregateOutputType | null
   }
@@ -2960,6 +3001,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phone?: boolean
+    visits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
     services?: boolean | Customer$servicesArgs<ExtArgs>
@@ -2970,6 +3012,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phone?: boolean
+    visits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["customer"]>
@@ -2978,6 +3021,7 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phone?: boolean
+    visits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }, ExtArgs["result"]["customer"]>
@@ -2986,11 +3030,12 @@ export namespace Prisma {
     id?: boolean
     name?: boolean
     phone?: boolean
+    visits?: boolean
     createdAt?: boolean
     updatedAt?: boolean
   }
 
-  export type CustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
+  export type CustomerOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "phone" | "visits" | "createdAt" | "updatedAt", ExtArgs["result"]["customer"]>
   export type CustomerInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     services?: boolean | Customer$servicesArgs<ExtArgs>
     _count?: boolean | CustomerCountOutputTypeDefaultArgs<ExtArgs>
@@ -3007,6 +3052,7 @@ export namespace Prisma {
       id: string
       name: string
       phone: string
+      visits: number
       createdAt: Date
       updatedAt: Date
     }, ExtArgs["result"]["customer"]>
@@ -3436,6 +3482,7 @@ export namespace Prisma {
     readonly id: FieldRef<"Customer", 'String'>
     readonly name: FieldRef<"Customer", 'String'>
     readonly phone: FieldRef<"Customer", 'String'>
+    readonly visits: FieldRef<"Customer", 'Int'>
     readonly createdAt: FieldRef<"Customer", 'DateTime'>
     readonly updatedAt: FieldRef<"Customer", 'DateTime'>
   }
@@ -10400,6 +10447,7 @@ export namespace Prisma {
     id: 'id',
     name: 'name',
     phone: 'phone',
+    visits: 'visits',
     createdAt: 'createdAt',
     updatedAt: 'updatedAt'
   };
@@ -10565,6 +10613,20 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'Int'
+   */
+  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
+    
+
+
+  /**
+   * Reference to a field of type 'Int[]'
+   */
+  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Decimal'
    */
   export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
@@ -10589,20 +10651,6 @@ export namespace Prisma {
    * Reference to a field of type 'PaymentMethod[]'
    */
   export type ListEnumPaymentMethodFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'PaymentMethod[]'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int'
-   */
-  export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
-    
-
-
-  /**
-   * Reference to a field of type 'Int[]'
-   */
-  export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
     
 
 
@@ -10704,6 +10752,7 @@ export namespace Prisma {
     id?: StringFilter<"Customer"> | string
     name?: StringFilter<"Customer"> | string
     phone?: StringFilter<"Customer"> | string
+    visits?: IntFilter<"Customer"> | number
     createdAt?: DateTimeFilter<"Customer"> | Date | string
     updatedAt?: DateTimeFilter<"Customer"> | Date | string
     services?: ServiceRecordListRelationFilter
@@ -10713,6 +10762,7 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phone?: SortOrder
+    visits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     services?: ServiceRecordOrderByRelationAggregateInput
@@ -10720,25 +10770,29 @@ export namespace Prisma {
 
   export type CustomerWhereUniqueInput = Prisma.AtLeast<{
     id?: string
+    phone?: string
     AND?: CustomerWhereInput | CustomerWhereInput[]
     OR?: CustomerWhereInput[]
     NOT?: CustomerWhereInput | CustomerWhereInput[]
     name?: StringFilter<"Customer"> | string
-    phone?: StringFilter<"Customer"> | string
+    visits?: IntFilter<"Customer"> | number
     createdAt?: DateTimeFilter<"Customer"> | Date | string
     updatedAt?: DateTimeFilter<"Customer"> | Date | string
     services?: ServiceRecordListRelationFilter
-  }, "id">
+  }, "id" | "phone">
 
   export type CustomerOrderByWithAggregationInput = {
     id?: SortOrder
     name?: SortOrder
     phone?: SortOrder
+    visits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: CustomerCountOrderByAggregateInput
+    _avg?: CustomerAvgOrderByAggregateInput
     _max?: CustomerMaxOrderByAggregateInput
     _min?: CustomerMinOrderByAggregateInput
+    _sum?: CustomerSumOrderByAggregateInput
   }
 
   export type CustomerScalarWhereWithAggregatesInput = {
@@ -10748,6 +10802,7 @@ export namespace Prisma {
     id?: StringWithAggregatesFilter<"Customer"> | string
     name?: StringWithAggregatesFilter<"Customer"> | string
     phone?: StringWithAggregatesFilter<"Customer"> | string
+    visits?: IntWithAggregatesFilter<"Customer"> | number
     createdAt?: DateTimeWithAggregatesFilter<"Customer"> | Date | string
     updatedAt?: DateTimeWithAggregatesFilter<"Customer"> | Date | string
   }
@@ -11242,6 +11297,7 @@ export namespace Prisma {
     id?: string
     name: string
     phone: string
+    visits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: ServiceRecordCreateNestedManyWithoutCustomerInput
@@ -11251,6 +11307,7 @@ export namespace Prisma {
     id?: string
     name: string
     phone: string
+    visits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
     services?: ServiceRecordUncheckedCreateNestedManyWithoutCustomerInput
@@ -11260,6 +11317,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: ServiceRecordUpdateManyWithoutCustomerNestedInput
@@ -11269,6 +11327,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     services?: ServiceRecordUncheckedUpdateManyWithoutCustomerNestedInput
@@ -11278,6 +11337,7 @@ export namespace Prisma {
     id?: string
     name: string
     phone: string
+    visits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -11286,6 +11346,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11294,6 +11355,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -11878,18 +11940,35 @@ export namespace Prisma {
     _max?: NestedDateTimeFilter<$PrismaModel>
   }
 
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
   export type CustomerCountOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     phone?: SortOrder
+    visits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type CustomerAvgOrderByAggregateInput = {
+    visits?: SortOrder
   }
 
   export type CustomerMaxOrderByAggregateInput = {
     id?: SortOrder
     name?: SortOrder
     phone?: SortOrder
+    visits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
   }
@@ -11898,8 +11977,29 @@ export namespace Prisma {
     id?: SortOrder
     name?: SortOrder
     phone?: SortOrder
+    visits?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type CustomerSumOrderByAggregateInput = {
+    visits?: SortOrder
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
   }
 
   export type DecimalFilter<$PrismaModel = never> = {
@@ -12436,6 +12536,14 @@ export namespace Prisma {
     connect?: ServiceRecordWhereUniqueInput | ServiceRecordWhereUniqueInput[]
   }
 
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type ServiceRecordUpdateManyWithoutCustomerNestedInput = {
     create?: XOR<ServiceRecordCreateWithoutCustomerInput, ServiceRecordUncheckedCreateWithoutCustomerInput> | ServiceRecordCreateWithoutCustomerInput[] | ServiceRecordUncheckedCreateWithoutCustomerInput[]
     connectOrCreate?: ServiceRecordCreateOrConnectWithoutCustomerInput | ServiceRecordCreateOrConnectWithoutCustomerInput[]
@@ -12653,6 +12761,33 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedDateTimeFilter<$PrismaModel>
     _max?: NestedDateTimeFilter<$PrismaModel>
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
   }
 
   export type NestedDecimalFilter<$PrismaModel = never> = {
@@ -13076,6 +13211,7 @@ export namespace Prisma {
     id?: string
     name: string
     phone: string
+    visits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13084,6 +13220,7 @@ export namespace Prisma {
     id?: string
     name: string
     phone: string
+    visits?: number
     createdAt?: Date | string
     updatedAt?: Date | string
   }
@@ -13139,6 +13276,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -13147,6 +13285,7 @@ export namespace Prisma {
     id?: StringFieldUpdateOperationsInput | string
     name?: StringFieldUpdateOperationsInput | string
     phone?: StringFieldUpdateOperationsInput | string
+    visits?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

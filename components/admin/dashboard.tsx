@@ -47,7 +47,7 @@ export function DashboardOverview() {
             <div className="flex items-center gap-2">
               <DollarSign className="w-5 h-5 text-primary" />
               <span className="text-2xl md:text-3xl font-bold text-foreground">
-                ${stats.totalRevenue.toLocaleString()}
+                ₦{stats.totalRevenue.toLocaleString()}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">This month</p>
@@ -62,7 +62,7 @@ export function DashboardOverview() {
             <div className="flex items-center gap-2">
               <Receipt className="w-5 h-5 text-destructive" />
               <span className="text-2xl md:text-3xl font-bold text-foreground">
-                ${stats.totalExpenses.toLocaleString()}
+                ₦{stats.totalExpenses.toLocaleString()}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">This month</p>
@@ -77,7 +77,7 @@ export function DashboardOverview() {
             <div className="flex items-center gap-2">
               <TrendingUp className="w-5 h-5 text-accent" />
               <span className="text-2xl md:text-3xl font-bold text-foreground">
-                ${stats.netProfit.toLocaleString()}
+                ₦{stats.netProfit.toLocaleString()}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-2">Revenue - Expenses</p>

@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState } from "react";
+import { createServiceRecord, type PaymentMethod } from "@/app/sales/actions";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,6 +20,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 interface ServiceRecordDialogProps {
   open: boolean;
@@ -59,26 +62,38 @@ export function ServiceRecordDialog({
   const [serviceType, setServiceType] = useState("");
   const [amount, setAmount] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("");
+  const router = useRouter();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // Handle form submission
-    console.log({
+
+    const res = await createServiceRecord({
       customerName,
       customerPhone,
       barberName,
       serviceType,
-      amount,
-      paymentMethod,
+      amount: parseFloat(amount),
+      paymentMethod: paymentMethod as PaymentMethod,
     });
-    onOpenChange(false);
-    // Reset form
+
+    if (res.error) {
+      toast.error("Failed to record service");
+    } else {
+      toast.success("Service record successfully!");
+    }
+
+    router.refresh();
+
+    // Revalidate sales page to show new data
+
+    // Reset form & close dialog
     setCustomerName("");
     setCustomerPhone("");
     setBarberName("");
     setServiceType("");
     setAmount("");
     setPaymentMethod("");
+    onOpenChange(false);
   };
 
   return (
@@ -95,7 +110,7 @@ export function ServiceRecordDialog({
             <Label htmlFor="customerName">Customer Name</Label>
             <Input
               id="customerName"
-              placeholder="John Smith"
+              placeholder="John Doe"
               value={customerName}
               onChange={(e) => setCustomerName(e.target.value)}
               required
@@ -107,7 +122,7 @@ export function ServiceRecordDialog({
             <Input
               id="customerPhone"
               type="tel"
-              placeholder="(555) 123-4567"
+              placeholder="08048278604"
               value={customerPhone}
               onChange={(e) => setCustomerPhone(e.target.value)}
               required
@@ -168,9 +183,9 @@ export function ServiceRecordDialog({
                 <SelectValue placeholder="Select payment method" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="cash">Cash</SelectItem>
-                <SelectItem value="card">Card</SelectItem>
-                <SelectItem value="Transfer">Mobile Transfer</SelectItem>
+                <SelectItem value="CASH">Cash</SelectItem>
+                <SelectItem value="CARD">Card</SelectItem>
+                <SelectItem value="TRANSFER">Mobile Transfer</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -183,7 +198,7 @@ export function ServiceRecordDialog({
             >
               Cancel
             </Button>
-            <Button type="submit" className="flex-1">
+            <Button type="submit" className="flex-1 cursor-pointer">
               Record Service
             </Button>
           </div>
