@@ -17,6 +17,7 @@ import {
   X,
 } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { signOut } from "next-auth/react";
 
 export default function AdminLayout({
   children,
@@ -25,6 +26,7 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
+  const [signingOut, setSigningOut] = useState(false);
 
   const navItems = [
     { href: "/admin/dashboard", label: "Dashboard", icon: LayoutDashboard },
@@ -100,11 +102,16 @@ export default function AdminLayout({
 
         {/* Sign out */}
         <div className="p-4 border-t border-border">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <Link href="/login">
-              <LogOut className="w-4 h-4 mr-3" />
-              Sign Out
-            </Link>
+          <Button
+            variant="ghost"
+            disabled={signingOut}
+            onClick={async () => {
+              setSigningOut(true);
+              await signOut({ callbackUrl: "/login" });
+            }}
+          >
+            <LogOut className="w-4 h-4 mr-3" />
+            {signingOut ? "Signing out..." : "Sign Out"}
           </Button>
         </div>
       </aside>
