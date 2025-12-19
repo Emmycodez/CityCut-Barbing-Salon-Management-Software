@@ -1,7 +1,12 @@
-import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Scissors, TrendingUp, Users, LogIn } from "lucide-react"
+import Link from "next/link";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Scissors, TrendingUp, Users, LogIn } from "lucide-react";
 
 export default function Home() {
   return (
@@ -30,15 +35,23 @@ export default function Home() {
       {/* Hero Section */}
       <main className="flex-1 container mx-auto px-4 py-12 md:py-20 bg-background text-foreground">
         <div className="max-w-4xl mx-auto text-center mb-16">
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">Streamline Your Barbershop Operations</h2>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-balance">
+            Streamline Your Barbershop Operations
+          </h2>
           <p className="text-lg md:text-xl text-muted-foreground mb-8 text-pretty">
-            Professional management system to record services, track expenses, and monitor revenue with ease.
+            Professional management system to record services, track expenses,
+            and monitor revenue with ease.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button asChild size="lg" className="text-base">
               <Link href="/sales">Sales Dashboard</Link>
             </Button>
-            <Button asChild size="lg" variant="outline" className="text-base bg-transparent">
+            <Button
+              asChild
+              size="lg"
+              variant="outline"
+              className="text-base bg-transparent"
+            >
               <Link href="/admin">Admin Dashboard</Link>
             </Button>
           </div>
@@ -53,7 +66,8 @@ export default function Home() {
               </div>
               <CardTitle>Service Recording</CardTitle>
               <CardDescription>
-                Quick and easy service entry with customer details, barber assignment, and payment tracking
+                Quick and easy service entry with customer details, barber
+                assignment, and payment tracking
               </CardDescription>
             </CardHeader>
           </Card>
@@ -65,7 +79,8 @@ export default function Home() {
               </div>
               <CardTitle>Revenue Analytics</CardTitle>
               <CardDescription>
-                Real-time sales summaries, expense tracking, and comprehensive revenue monitoring
+                Real-time sales summaries, expense tracking, and comprehensive
+                revenue monitoring
               </CardDescription>
             </CardHeader>
           </Card>
@@ -77,7 +92,8 @@ export default function Home() {
               </div>
               <CardTitle>Customer Management</CardTitle>
               <CardDescription>
-                Maintain detailed customer records with service history and contact information
+                Maintain detailed customer records with service history and
+                contact information
               </CardDescription>
             </CardHeader>
           </Card>
@@ -87,9 +103,12 @@ export default function Home() {
       {/* Footer */}
       <footer className="border-t border-border py-6">
         <div className="container mx-auto px-4 text-center text-sm text-muted-foreground">
-          <p>© 2025 CityCut BarberShop Management System. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} CityCut BarberShop Management System.
+            All rights reserved.
+          </p>
         </div>
       </footer>
     </div>
-  )
+  );
 }
