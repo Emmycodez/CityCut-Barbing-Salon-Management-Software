@@ -4,10 +4,6 @@ import bcrypt from "bcrypt"
 
 
 
-
-
-
-
 async function main() {
   const password = await bcrypt.hash("password123", 10)
 
