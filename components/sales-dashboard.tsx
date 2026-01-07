@@ -29,6 +29,7 @@ import {
 import { ServiceRecordDialog } from "./service-record-dialog";
 import { ExpenseRecordDialog } from "./expense-record-dialog";
 import { Decimal } from "@prisma/client/runtime/client";
+import { signOut } from "next-auth/react";
 
 interface Props {
   services: any[];
@@ -50,7 +51,6 @@ export function SalesDashboard({
   const [selectedService, setSelectedService] = useState<any | null>(null);
   const [selectedExpense, setSelectedExpense] = useState<any | null>(null);
 
-
   return (
     <div className="min-h-screen flex flex-col ">
       {/* Header */}
@@ -70,11 +70,18 @@ export function SalesDashboard({
                 </p>
               </div>
             </div>
-            <Button asChild variant="ghost" size="sm">
-              <Link href="/login">
-                <LogOut className="w-4 h-4 mr-2" />
-                Sign Out
-              </Link>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() =>
+                signOut({
+                  callbackUrl: "/login",
+                })
+              }
+              className="cursor-pointer"
+            >
+              <LogOut className="w-4 h-4 mr-2" />
+              Sign Out
             </Button>
           </div>
         </div>

@@ -1,142 +1,222 @@
+"use client";
 
-"use client"
-
-import { useState, useMemo } from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Users, MessageCircle, Phone, MessageCircleWarning, Search } from "lucide-react"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { useState, useMemo, useTransition } from "react";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Users,
+  MessageCircle,
+  Phone,
+  MessageCircleWarning,
+  Search,
+  Trash2,
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
+import { deleteCustomer } from "@/app/admin/customers/actions";
+import toast from "react-hot-toast";
 
 interface Customer {
-  id: string
-  name: string
-  phone: string
-  visits: number
-  lastVisit: string
-  totalSpent: number
-  hasVisits: boolean
+  id: string;
+  name: string;
+  phone: string;
+  visits: number;
+  lastVisit: string;
+  totalSpent: number;
+  hasVisits: boolean;
 }
 
 interface Props {
-  customers: Customer[]
+  customers: Customer[];
 }
 
 export function CustomerRecords({ customers }: Props) {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [sortBy, setSortBy] = useState<"name" | "visits" | "spent">("name")
+  const [searchQuery, setSearchQuery] = useState("");
+  const [sortBy, setSortBy] = useState<"name" | "visits" | "spent">("name");
+  const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
+    null
+  );
+  const [isPending, startTransition] = useTransition();
 
   // Filter and sort customers
   const filteredAndSortedCustomers = useMemo(() => {
-    let filtered = customers
+    let filtered = customers;
 
     // Apply search filter
     if (searchQuery) {
-      const query = searchQuery.toLowerCase()
+      const query = searchQuery.toLowerCase();
       filtered = filtered.filter(
-        customer =>
+        (customer) =>
           customer.name.toLowerCase().includes(query) ||
           customer.phone.includes(query)
-      )
+      );
     }
 
     // Sort customers
     const sorted = [...filtered].sort((a, b) => {
       switch (sortBy) {
         case "visits":
-          return b.visits - a.visits
+          return b.visits - a.visits;
         case "spent":
-          return b.totalSpent - a.totalSpent
+          return b.totalSpent - a.totalSpent;
         case "name":
         default:
-          return a.name.localeCompare(b.name)
+          return a.name.localeCompare(b.name);
       }
-    })
+    });
 
-    return sorted
-  }, [customers, searchQuery, sortBy])
+    return sorted;
+  }, [customers, searchQuery, sortBy]);
 
   // Calculate stats
   const stats = useMemo(() => {
-    const total = customers.length
-    const active = customers.filter(c => c.hasVisits).length
-    const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0)
-    const avgSpent = total > 0 ? totalRevenue / total : 0
+    const total = customers.length;
+    const active = customers.filter((c) => c.hasVisits).length;
+    const totalRevenue = customers.reduce((sum, c) => sum + c.totalSpent, 0);
+    const avgSpent = total > 0 ? totalRevenue / total : 0;
 
-    return { total, active, totalRevenue, avgSpent }
-  }, [customers])
+    return { total, active, totalRevenue, avgSpent };
+  }, [customers]);
 
   const handleWhatsApp = (phone: string, name: string) => {
     // Remove non-numeric characters and format for WhatsApp
-    const cleanPhone = phone.replace(/\D/g, "")
-    const message = encodeURIComponent(`Hello ${name}, thank you for choosing CityCut BarberShop!`)
-    window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank")
-  }
+    const cleanPhone = phone.replace(/\D/g, "");
+    const message = encodeURIComponent(
+      `Hello ${name}, thank you for choosing CityCut BarberShop!`
+    );
+    window.open(`https://wa.me/${cleanPhone}?text=${message}`, "_blank");
+  };
 
   const handleCall = (phone: string) => {
-    window.location.href = `tel:${phone}`
-  }
+    window.location.href = `tel:${phone}`;
+  };
+
+  const handleDeleteCustomer = async () => {
+    if (!customerToDelete) return;
+
+    startTransition(async () => {
+      const result = await deleteCustomer(customerToDelete.id);
+
+      if (result.success) {
+        toast.success(result.message);
+        setCustomerToDelete(null);
+      } else {
+        toast.error(result.message);
+      }
+    });
+  };
 
   return (
     <div className="p-4 md:p-6 lg:p-8 space-y-6">
       {/* Header */}
       <div>
-        <h2 className="text-2xl md:text-3xl font-bold text-foreground">Customer Records</h2>
-        <p className="text-muted-foreground">All registered customers and their service history</p>
+        <h2 className="text-2xl md:text-3xl font-bold text-foreground">
+          Customer Records
+        </h2>
+        <p className="text-muted-foreground">
+          All registered customers and their service history
+        </p>
       </div>
 
       {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Customers</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Customers
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-primary" />
-              <span className="text-2xl font-bold text-foreground">{stats.total}</span>
+              <span className="text-2xl font-bold text-foreground">
+                {stats.total}
+              </span>
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Active Customers</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Active Customers
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <Users className="w-5 h-5 text-accent" />
-              <span className="text-2xl font-bold text-foreground">{stats.active}</span>
+              <span className="text-2xl font-bold text-foreground">
+                {stats.active}
+              </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">
-              {stats.total > 0 ? Math.round((stats.active / stats.total) * 100) : 0}% with visits
+              {stats.total > 0
+                ? Math.round((stats.active / stats.total) * 100)
+                : 0}
+              % with visits
             </p>
           </CardContent>
         </Card>
 
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Total Revenue</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Total Revenue
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">
-                ₦{stats.totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₦
+                {stats.totalRevenue.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
-            <p className="text-xs text-muted-foreground mt-1">From all customers</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              From all customers
+            </p>
           </CardContent>
         </Card>
 
         <Card className="border-border bg-card">
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm font-medium text-muted-foreground">Average Spent</CardTitle>
+            <CardTitle className="text-sm font-medium text-muted-foreground">
+              Average Spent
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-2">
               <span className="text-2xl font-bold text-foreground">
-                ₦{stats.avgSpent.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+                ₦
+                {stats.avgSpent.toLocaleString(undefined, {
+                  minimumFractionDigits: 2,
+                  maximumFractionDigits: 2,
+                })}
               </span>
             </div>
             <p className="text-xs text-muted-foreground mt-1">Per customer</p>
@@ -148,7 +228,9 @@ export function CustomerRecords({ customers }: Props) {
       <Card className="border-border bg-card">
         <CardHeader>
           <CardTitle>Search & Filter</CardTitle>
-          <CardDescription>Find customers by name or phone number</CardDescription>
+          <CardDescription>
+            Find customers by name or phone number
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <div className="flex flex-col md:flex-row gap-4">
@@ -167,7 +249,12 @@ export function CustomerRecords({ customers }: Props) {
             </div>
             <div className="w-full md:w-[200px] space-y-2">
               <Label htmlFor="sort">Sort By</Label>
-              <Select value={sortBy} onValueChange={(value: "name" | "visits" | "spent") => setSortBy(value)}>
+              <Select
+                value={sortBy}
+                onValueChange={(value: "name" | "visits" | "spent") =>
+                  setSortBy(value)
+                }
+              >
                 <SelectTrigger id="sort">
                   <SelectValue />
                 </SelectTrigger>
@@ -187,7 +274,8 @@ export function CustomerRecords({ customers }: Props) {
         <CardHeader>
           <CardTitle>All Customers</CardTitle>
           <CardDescription>
-            Showing {filteredAndSortedCustomers.length} of {customers.length} customers
+            Showing {filteredAndSortedCustomers.length} of {customers.length}{" "}
+            customers
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -195,7 +283,9 @@ export function CustomerRecords({ customers }: Props) {
             <div className="space-y-4 flex flex-col items-center justify-center py-12">
               <MessageCircleWarning className="w-12 h-12 text-muted-foreground" />
               <div className="text-center">
-                <p className="font-medium text-foreground">No customers found</p>
+                <p className="font-medium text-foreground">
+                  No customers found
+                </p>
                 <p className="text-sm text-muted-foreground mt-1">
                   {searchQuery
                     ? "Try adjusting your search query"
@@ -220,36 +310,61 @@ export function CustomerRecords({ customers }: Props) {
                       <Users className="w-5 h-5 text-accent" />
                     </div>
                     <div>
-                      <p className="font-medium text-foreground">{customer.name}</p>
-                      <p className="text-sm text-muted-foreground">{customer.phone}</p>
+                      <p className="font-medium text-foreground">
+                        {customer.name}
+                      </p>
+                      <p className="text-sm text-muted-foreground">
+                        {customer.phone}
+                      </p>
                     </div>
                   </div>
                   <div className="flex items-center gap-3 ml-13 md:ml-0 flex-wrap">
                     <div className="text-left md:text-right">
                       <p className="text-sm font-semibold text-foreground">
-                        {customer.visits} visit{customer.visits !== 1 ? 's' : ''}
+                        {customer.visits} visit
+                        {customer.visits !== 1 ? "s" : ""}
                       </p>
-                      <p className="text-xs text-muted-foreground">Last: {customer.lastVisit}</p>
+                      <p className="text-xs text-muted-foreground">
+                        Last: {customer.lastVisit}
+                      </p>
                     </div>
                     <div className="text-left md:text-right min-w-[80px]">
                       <p className="text-sm font-semibold text-foreground">
                         ₦{customer.totalSpent.toFixed(2)}
                       </p>
-                      <p className="text-xs text-muted-foreground">Total spent</p>
+                      <p className="text-xs text-muted-foreground">
+                        Total spent
+                      </p>
                     </div>
                     <div className="flex gap-2">
                       <Button
                         size="sm"
                         variant="outline"
                         className="bg-green-500/10 hover:bg-green-500/20 border-green-500/30"
-                        onClick={() => handleWhatsApp(customer.phone, customer.name)}
+                        onClick={() =>
+                          handleWhatsApp(customer.phone, customer.name)
+                        }
                       >
                         <MessageCircle className="w-4 h-4 mr-1" />
                         WhatsApp
                       </Button>
-                      <Button size="sm" variant="outline" onClick={() => handleCall(customer.phone)}>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => handleCall(customer.phone)}
+                      >
                         <Phone className="w-4 h-4 mr-1" />
                         Call
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="destructive"
+                        onClick={() => setCustomerToDelete(customer)}
+                        disabled={isPending}
+                        className="cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4 mr-1" />
+                        Delete
                       </Button>
                     </div>
                   </div>
@@ -259,6 +374,51 @@ export function CustomerRecords({ customers }: Props) {
           )}
         </CardContent>
       </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog
+        open={!!customerToDelete}
+        onOpenChange={() => setCustomerToDelete(null)}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the
+              customer and all their associated service records.
+              {customerToDelete && (
+                <div className="mt-3 p-3 bg-secondary/50 rounded-lg space-y-1">
+                  <span className="font-medium text-foreground">
+                    {customerToDelete.name}
+                  </span>
+                  <br />
+                  <span className="text-sm text-muted-foreground">
+                    Phone: {customerToDelete.phone}
+                  </span>
+                  <br />
+                  <span className="text-sm text-muted-foreground">
+                    Total Visits: {customerToDelete.visits}
+                  </span>
+                  <br />
+                  <span className="text-sm text-muted-foreground">
+                    Total Spent: ₦{customerToDelete.totalSpent.toFixed(2)}
+                  </span>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteCustomer}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? "Deleting..." : "Delete Customer"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
-  )
+  );
 }

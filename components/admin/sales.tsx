@@ -1,15 +1,18 @@
-
 "use client"
 
-import { useState, useMemo } from "react"
+import { useState, useMemo, useTransition } from "react"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Scissors, Filter, Eye, MessageCircleWarning } from "lucide-react"
+import { Scissors, Filter, Eye, MessageCircleWarning, Trash2, Pencil } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog"
 import { format, parse, startOfMonth, endOfMonth, isWithinInterval } from "date-fns"
+import { deleteSale } from "@/app/admin/sales/actions"
+import { ServiceEditDialog } from "../service-edit-dialog" 
+import toast from "react-hot-toast"
 
 interface Sale {
   id: string
@@ -33,6 +36,10 @@ export function SalesHistory({ sales }: Props) {
   const [dateFilter, setDateFilter] = useState("")
   const [monthFilter, setMonthFilter] = useState("")
   const [selectedSale, setSelectedSale] = useState<Sale | null>(null)
+  const [saleToDelete, setSaleToDelete] = useState<Sale | null>(null)
+  const [saleToEdit, setSaleToEdit] = useState<any | null>(null)
+  const [isPending, startTransition] = useTransition()
+ 
 
   // Filter sales based on selected filters
   const filteredSales = useMemo(() => {
@@ -74,6 +81,21 @@ export function SalesHistory({ sales }: Props) {
     setFilterType("all")
     setDateFilter("")
     setMonthFilter("")
+  }
+
+  const handleDeleteSale = async () => {
+    if (!saleToDelete) return
+
+    startTransition(async () => {
+      const result = await deleteSale(saleToDelete.id)
+
+      if (result.success) {
+        toast.success( result.message)
+        setSaleToDelete(null)
+      } else {
+        toast.error(result.message)
+      }
+    })
   }
 
   return (
@@ -207,7 +229,7 @@ export function SalesHistory({ sales }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 ml-13 md:ml-0">
+                  <div className="flex items-center gap-2 ml-13 md:ml-0 flex-wrap">
                     <div className="text-left md:text-right flex-1">
                       <p className="font-semibold text-foreground">₦{sale.amount.toFixed(2)}</p>
                       <p className="text-xs text-muted-foreground">{sale.paymentMethod}</p>
@@ -219,6 +241,32 @@ export function SalesHistory({ sales }: Props) {
                     <Button size="sm" variant="outline" onClick={() => setSelectedSale(sale)} className="cursor-pointer">
                       <Eye className="w-4 h-4 mr-1" />
                       View
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="outline" 
+                      onClick={() => setSaleToEdit({
+                        id: sale.id,
+                        serviceType: sale.service,
+                        barberName: sale.barber,
+                        amountPaid: sale.amount,
+                        paymentMethod: sale.paymentMethod,
+                        serviceDate: sale.fullDate,
+                      })} 
+                      className="cursor-pointer"
+                    >
+                      <Pencil className="w-4 h-4 mr-1" />
+                      Edit
+                    </Button>
+                    <Button 
+                      size="sm" 
+                      variant="destructive" 
+                      onClick={() => setSaleToDelete(sale)} 
+                      disabled={isPending}
+                      className="cursor-pointer"
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Delete
                     </Button>
                   </div>
                 </div>
@@ -284,6 +332,48 @@ export function SalesHistory({ sales }: Props) {
           )}
         </DialogContent>
       </Dialog>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={!!saleToDelete} onOpenChange={() => setSaleToDelete(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the sale record for:
+              {saleToDelete && (
+                <div className="mt-3 p-3 bg-secondary/50 rounded-lg space-y-1 flex flex-col">
+                  <span className="font-medium text-foreground">
+                    {saleToDelete.customer} - {saleToDelete.service}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Amount: ₦{saleToDelete.amount.toFixed(2)}
+                  </span>
+                  <span className="text-sm text-muted-foreground">
+                    Date: {saleToDelete.date} at {saleToDelete.time}
+                  </span>
+                </div>
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteSale}
+              disabled={isPending}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isPending ? "Deleting..." : "Delete"}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      {/* Edit Service Dialog */}
+      <ServiceEditDialog
+        open={!!saleToEdit}
+        onOpenChange={(open) => !open && setSaleToEdit(null)}
+        service={saleToEdit}
+      />
     </div>
   )
 }
