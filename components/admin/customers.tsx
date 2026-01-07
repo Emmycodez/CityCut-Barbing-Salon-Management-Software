@@ -18,6 +18,7 @@ import {
   MessageCircleWarning,
   Search,
   Trash2,
+  Pencil,
 } from "lucide-react";
 import {
   Select,
@@ -37,6 +38,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { deleteCustomer } from "@/app/admin/customers/actions";
+import { CustomerEditDialog } from "../customer-edit-dialog";
 import toast from "react-hot-toast";
 
 interface Customer {
@@ -59,6 +61,7 @@ export function CustomerRecords({ customers }: Props) {
   const [customerToDelete, setCustomerToDelete] = useState<Customer | null>(
     null
   );
+  const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
   const [isPending, startTransition] = useTransition();
 
   // Filter and sort customers
@@ -318,7 +321,7 @@ export function CustomerRecords({ customers }: Props) {
                       </p>
                     </div>
                   </div>
-                  <div className="flex items-center gap-3 ml-13 md:ml-0 flex-wrap">
+                  <div className="flex items-center gap-2 ml-13 md:ml-0 flex-wrap">
                     <div className="text-left md:text-right">
                       <p className="text-sm font-semibold text-foreground">
                         {customer.visits} visit
@@ -355,6 +358,14 @@ export function CustomerRecords({ customers }: Props) {
                       >
                         <Phone className="w-4 h-4 mr-1" />
                         Call
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setCustomerToEdit(customer)}
+                      >
+                        <Pencil className="w-4 h-4 mr-1" />
+                        Edit
                       </Button>
                       <Button
                         size="sm"
@@ -419,6 +430,13 @@ export function CustomerRecords({ customers }: Props) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Edit Customer Dialog */}
+      <CustomerEditDialog
+        open={!!customerToEdit}
+        onOpenChange={(open) => !open && setCustomerToEdit(null)}
+        customer={customerToEdit}
+      />
     </div>
   );
 }
